@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicación de Inventario</title>
+    <style>
+        /* color para el fondo */
+        h1 {
+            background-color: #7284e7; /* Este es un tono de verde */
+            padding: 10px;
+            text-align: center;
+            }
+            footer {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        /* Estilos CSS */
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #itemName, #itemQuantity {
+            width: 200px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        #addItemBtn {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        #itemList {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .inventoryItem {
+            background-color: #f4f4f4;
+            padding: 10px;
+            margin-bottom: 5px;
+        }
+
+        .deleteBtn {
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <h1>Aplicación de Inventario</h1>
+    <input type="text" id="itemName" placeholder="Nombre del artículo">
+    <input type="number" id="itemQuantity" placeholder="Cantidad">
+    <button id="addItemBtn">Agregar al inventario</button>
+    <ul id="itemList"></ul>
+
+    <script>
+        // Función para inicializar la aplicación
+        function init() {
+            loadInventory(); // Cargar elementos del inventario almacenados
+            document.getElementById("addItemBtn").addEventListener("click", addItem);
+        }
+
+        // Función para cargar elementos del inventario desde el almacenamiento local
+        function loadInventory() {
+            var storedInventory = localStorage.getItem("inventory");
+            if (storedInventory) {
+                inventory = JSON.parse(storedInventory);
+                renderInventory();
+            }
+        }
+
+        // Función para guardar elementos del inventario en el almacenamiento local
+        function saveInventory() {
+            localStorage.setItem("inventory", JSON.stringify(inventory));
+        }
+
+        // Array para almacenar los elementos del inventario
+        var inventory = [];
+
+        // Función para agregar un nuevo elemento al inventario
+        function addItem() {
+            var itemName = document.getElementById("itemName").value.trim();
+            var itemQuantity = document.getElementById("itemQuantity").value.trim();
+
+            if (itemName !== "" && itemQuantity !== "" && !isNaN(itemQuantity) && parseInt(itemQuantity) > 0) {
+                var newItem = {
+                    name: itemName,
+                    quantity: parseInt(itemQuantity)
+                };
+
+                inventory.push(newItem);
+                saveInventory(); // Guardar el inventario después de agregar un elemento
+                renderInventory();
+                clearInputFields();
+            } else {
+                alert("Por favor, ingresa un nombre y una cantidad válida para el artículo.");
+            }
+        }
+
+        // Función para renderizar la lista de elementos del inventario
+        function renderInventory() {
+            var itemList = document.getElementById("itemList");
+            itemList.innerHTML = "";
+
+            inventory.forEach(function(item, index) {
+                var listItem = document.createElement("li");
+                listItem.className = "inventoryItem";
+                listItem.innerHTML = item.name + " - Cantidad: " + item.quantity + ' <button class="deleteBtn" onclick="deleteItem(' + index + ')">Eliminar</button>';
+                itemList.appendChild(listItem);
+            });
+        }
+
+        // Función para eliminar un elemento del inventario
+        function deleteItem(index) {
+            if (confirm("¿Estás seguro de que quieres eliminar este artículo del inventario?")) {
+                inventory.splice(index, 1);
+                saveInventory(); // Guardar el inventario después de eliminar un elemento
+                renderInventory();
+            }
+        }
+
+        // Función para limpiar los campos de entrada
+        function clearInputFields() {
+            document.getElementById("itemName").value = "";
+            document.getElementById("itemQuantity").value = "";
+        }
+
+        // Inicializar la aplicación cuando el documento HTML esté completamente cargado
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
+</body>
+<footer>
+    <p>©2024 LUC LUC</p>
+</footer>
+</html>
